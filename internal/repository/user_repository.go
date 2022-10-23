@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
 	models "whatsapp-app/model"
 
@@ -20,7 +21,11 @@ type IUserRepository interface {
 	FindAllUser() ([]*models.User, error)
 	IsDuplicateSchoolID(id int32) bool
 	CreateUser(newUser *models.User) error
-	//Remove(username string) error
+	Login(school_id int32) (*models.User, error)
+	FindUserWithEmail(email string) (*models.User, error)
+	IsExistWithEmail(email string) bool
+
+	UpdateUser(user *models.User) error
 }
 
 type UserRepository struct {
@@ -69,15 +74,45 @@ func (u *UserRepository) FindAllUser() ([]*models.User, error) {
 }
 
 func (u *UserRepository) IsDuplicateSchoolID(id int32) bool {
-
-	// ctx, cancel := context.WithTimeout(context.Background(), mongoQueryTimeout)
-	// defer cancel()
-
 	user := &models.User{}
-
 	err := mgm.Coll(user).First(bson.M{"school_id": id}, user)
 	if err != nil {
 		return false
 	}
 	return true
+}
+func (u *UserRepository) IsExistWithEmail(email string) bool {
+	user := &models.User{}
+	err := mgm.Coll(user).First(bson.M{"email": email}, user)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (u *UserRepository) FindUserWithEmail(email string) (*models.User, error) {
+	user := &models.User{}
+	err := mgm.Coll(user).First(bson.M{"email": email}, user)
+	if err != nil {
+		return user, err
+	}
+	return user, err
+}
+
+func (u *UserRepository) Login(school_id int32) (*models.User, error) {
+
+	user := &models.User{}
+	err := mgm.Coll(user).First(bson.M{"school_id": school_id}, user)
+	if err != nil {
+		return user, errors.New("Kullanıcı bulunamadı.")
+	}
+	return user, nil
+}
+
+func (u *UserRepository) UpdateUser(user *models.User) error {
+	err := mgm.Coll(user).Update(user)
+	if err != nil {
+		return err
+	}
+	return nil
 }

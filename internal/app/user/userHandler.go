@@ -13,6 +13,9 @@ import (
 
 type IUserHandler interface {
 	Register(ctx echo.Context) error
+	Login(ctx echo.Context) error
+	SendEmail(ctx echo.Context) error
+	VerifyEmail(ctx echo.Context) error
 }
 
 type UserHandler struct {
@@ -41,4 +44,48 @@ func (h *UserHandler) Register(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, response.Response(http.StatusOK, user))
 
+}
+
+func (h *UserHandler) Login(c echo.Context) error {
+	var request request.UserLoginDTO
+	if validate.Validator(&c, &request) != nil {
+		return nil
+	}
+	ctx := c.Request().Context()
+
+	user, err := h.service.Login(ctx, request)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, response.Response(http.StatusBadRequest, err.Error()))
+
+	}
+	return c.JSON(http.StatusOK, response.Response(http.StatusOK, user))
+
+}
+func (h *UserHandler) SendEmail(c echo.Context) error {
+	var request request.UserVerifyDTO
+	if validate.Validator(&c, &request) != nil {
+		return nil
+	}
+	ctx := c.Request().Context()
+
+	message, err := h.service.SendVerifyEmail(ctx, request)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, response.Response(http.StatusBadRequest, err.Error()))
+
+	}
+	return c.JSON(http.StatusOK, response.Response(http.StatusOK, message))
+}
+func (h *UserHandler) VerifyEmail(c echo.Context) error {
+	var request request.UserVerifyEmailDTO
+	if validate.Validator(&c, &request) != nil {
+		return nil
+	}
+	ctx := c.Request().Context()
+
+	message, err := h.service.VerifyUserEmail(ctx, request)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, response.Response(http.StatusBadRequest, err.Error()))
+
+	}
+	return c.JSON(http.StatusOK, response.Response(http.StatusOK, message))
 }

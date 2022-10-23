@@ -11,6 +11,7 @@ type User struct {
 	Password         string `json:"password" bson:"password"`
 	SchoolID         int32  `json:"school_id" bson:"school_id"`
 	Email            string `json:"email" bson:"email"`
+	Verified         bool   `json:"verified" bson:"verified"`
 }
 
 func NewUser(user *User) *User {
@@ -20,5 +21,18 @@ func NewUser(user *User) *User {
 		SchoolID: user.SchoolID,
 		Email:    user.Email,
 		Password: user.Password,
+	}
+}
+
+type VerifyCode struct {
+	mgm.DefaultModel `bson:"inline"`
+	Code             int32  `json:"code" bson:"code"`
+	Email            string `json:"email" bson:"email"`
+}
+
+func NewVerifyCode(code *VerifyCode) *VerifyCode {
+	return &VerifyCode{
+		Code:  code.Code,
+		Email: code.Email,
 	}
 }
