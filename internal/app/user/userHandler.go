@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"whatsapp-app/dto/request"
 	userService "whatsapp-app/internal/service/user"
+	utils "whatsapp-app/internal/utils"
 	"whatsapp-app/internal/utils/response"
 	"whatsapp-app/internal/utils/validate"
 
@@ -16,11 +17,13 @@ type IUserHandler interface {
 
 type UserHandler struct {
 	service userService.IUserService
+	utils   utils.IUtils
 }
 
-func NewUserHandler(service userService.IUserService) IUserHandler {
+func NewUserHandler(service userService.IUserService, utils utils.IUtils) IUserHandler {
 	return &UserHandler{
 		service: service,
+		utils:   utils,
 	}
 }
 

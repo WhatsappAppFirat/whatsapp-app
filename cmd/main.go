@@ -2,6 +2,9 @@ package main
 
 import (
 	"whatsapp-app/internal/config/db"
+	"whatsapp-app/router"
+
+	"github.com/labstack/echo/v4"
 )
 
 func init() {
@@ -10,15 +13,9 @@ func init() {
 
 func main() {
 
-	// newStudent := models.User{
-	// 	Name:     "Samet",
-	// 	Surname:  "Avci",
-	// 	SchoolID: 210541076,
-	// }
-	// student := models.NewStudent(newStudent)
+	db := db.Connect()
+	e := echo.New()
+	router.Init(e, db)
+	e.Logger.Fatal(e.Start(":8080"))
 
-	// err := mgm.Coll(student).Create(student)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
 }
