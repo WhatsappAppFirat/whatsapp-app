@@ -3,7 +3,7 @@ package jwt
 import (
 	configs "whatsapp-app/internal/config"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

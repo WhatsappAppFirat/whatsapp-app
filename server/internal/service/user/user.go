@@ -15,7 +15,7 @@ import (
 	jwtPackage "whatsapp-app/internal/utils/jwt"
 	models "whatsapp-app/model"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 
 	"golang.org/x/crypto/bcrypt"
 )
