@@ -27,6 +27,7 @@ type IUserService interface {
 	VerifyUserEmail(ctx context.Context, userVerifyRequest request.UserVerifyEmailDTO) (response.UserVerifyDTO, error)
 }
 
+//TODO: Service 'e bakılacak
 type UserService struct {
 	repository repository.IUserRepository
 	service.Service
@@ -44,6 +45,7 @@ func (s *UserService) Register(ctx context.Context, request request.UserRegister
 
 	school_id, err := strconv.Atoi(findSchoolID[0])
 	if err != nil {
+
 		return response.UserRegisterDTO{}, errors.New("Kullanıcı oluşturlamadı lütfen tekrar deneyiniz")
 	}
 
@@ -51,6 +53,8 @@ func (s *UserService) Register(ctx context.Context, request request.UserRegister
 	if isExist {
 		return response.UserRegisterDTO{}, errors.New("Kayıt olmak istediğiniz kullanıcı zaten var.")
 	}
+
+	apiKey := s.Utils.GenerateRandomString(40)
 
 	var hashPassword string
 	hashPassword, err = s.Utils.GeneratePassword(request.Password)
@@ -70,6 +74,7 @@ func (s *UserService) Register(ctx context.Context, request request.UserRegister
 		Password: hashPassword,
 		SchoolID: int32(school_id),
 		Email:    request.Email,
+		ApiKey:   apiKey,
 	}
 	err = s.repository.CreateUser(&newUser)
 	if err != nil {
@@ -107,7 +112,7 @@ func (s *UserService) Login(ctx context.Context, request request.UserLoginDTO) (
 	claims := &jwtPackage.JwtCustomClaims{
 		ID: user.ID,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 24 * 5).Unix(),
 		},
 	}
 

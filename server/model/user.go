@@ -12,6 +12,7 @@ type User struct {
 	SchoolID         int32  `json:"school_id" bson:"school_id"`
 	Email            string `json:"email" bson:"email"`
 	Verified         bool   `json:"verified" bson:"verified"`
+	ApiKey           string `json:"api_key" bson:"api_key"`
 }
 
 func NewUser(user *User) *User {

@@ -24,7 +24,7 @@ type IUserRepository interface {
 	Login(school_id int32) (*models.User, error)
 	FindUserWithEmail(email string) (*models.User, error)
 	IsExistWithEmail(email string) bool
-
+	FindWithApiKey(apiKey string) (*models.User, error)
 	UpdateUser(user *models.User) error
 }
 
@@ -81,6 +81,8 @@ func (u *UserRepository) IsDuplicateSchoolID(id int32) bool {
 	}
 	return true
 }
+
+
 func (u *UserRepository) IsExistWithEmail(email string) bool {
 	user := &models.User{}
 	err := mgm.Coll(user).First(bson.M{"email": email}, user)
@@ -93,9 +95,7 @@ func (u *UserRepository) IsExistWithEmail(email string) bool {
 func (u *UserRepository) FindUserWithEmail(email string) (*models.User, error) {
 	user := &models.User{}
 	err := mgm.Coll(user).First(bson.M{"email": email}, user)
-	if err != nil {
-		return user, err
-	}
+
 	return user, err
 }
 
@@ -111,8 +111,14 @@ func (u *UserRepository) Login(school_id int32) (*models.User, error) {
 
 func (u *UserRepository) UpdateUser(user *models.User) error {
 	err := mgm.Coll(user).Update(user)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
+}
+
+func (u *UserRepository) FindWithApiKey(apiKey string) (*models.User, error) {
+
+	user := &models.User{}
+	err := mgm.Coll(user).First(bson.M{"api_key": apiKey}, user)
+	return user, err
+
 }

@@ -16,6 +16,8 @@ import (
 	gomail "gopkg.in/mail.v2"
 )
 
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-*/"
+
 type IUtils interface {
 	GetUser(c *echo.Context) models.User
 	EqualPassword(old, new string) bool
@@ -23,6 +25,7 @@ type IUtils interface {
 	SplitSchoolID(email string) int
 	RandNumber(start int, end int) int
 	SendEmail(toEmail string, code int) error
+	GenerateRandomString(n int) string
 }
 
 type Utils struct{}
@@ -105,4 +108,12 @@ func (u *Utils) SendEmail(toEmail string, code int) error {
 	}
 
 	return nil
+}
+
+func (u *Utils) GenerateRandomString(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Int63()%int64(len(letterBytes))]
+	}
+	return string(b)
 }
