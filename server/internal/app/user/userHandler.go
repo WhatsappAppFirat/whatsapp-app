@@ -75,6 +75,7 @@ func (h *UserHandler) SendEmail(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, response.Response(http.StatusOK, message))
 }
+
 func (h *UserHandler) VerifyEmail(c echo.Context) error {
 	var request request.UserVerifyEmailDTO
 	if validate.Validator(&c, &request) != nil {
@@ -89,3 +90,4 @@ func (h *UserHandler) VerifyEmail(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, response.Response(http.StatusOK, message))
 }
+

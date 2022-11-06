@@ -37,12 +37,9 @@ func NewUserRepository(db *mongo.Database) IUserRepository {
 }
 
 func (u *UserRepository) CreateUser(newUser *models.User) error {
-
 	user := models.NewUser(newUser)
-
 	err := mgm.Coll(user).Create(user)
 	return err
-
 }
 
 func (u *UserRepository) FindAllUser() ([]*models.User, error) {
@@ -81,7 +78,6 @@ func (u *UserRepository) IsDuplicateSchoolID(id int32) bool {
 	}
 	return true
 }
-
 
 func (u *UserRepository) IsExistWithEmail(email string) bool {
 	user := &models.User{}

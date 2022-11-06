@@ -1,6 +1,7 @@
 package router
 
 import (
+	"whatsapp-app/internal/app/group"
 	"whatsapp-app/internal/app/user"
 	configs "whatsapp-app/internal/config"
 	"whatsapp-app/internal/middlewares"
@@ -26,5 +27,10 @@ func Init(router *echo.Echo, tx *mongo.Database, client *redis.Client) {
 
 	auth.Use(middleware.JWTWithConfig(configs.JWTConfigApp))
 	auth.Use(middlewares.VerifyToken)
+
+	groupHandler := group.GroupInit(tx)
+	auth.POST("/group", groupHandler.NewGroup)
+	auth.POST("/department", groupHandler.NewDepartment)
+	auth.POST("/faculty", groupHandler.NewFaculty)
 
 }
