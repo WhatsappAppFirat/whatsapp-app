@@ -47,18 +47,20 @@ export const Register = () => {
           </label>
           <Input name="password" placeholder="Şifre" type="password" />
         </div>
+        <div className="text-center">
+          <Button type="submit" className="mt-10">
+            Kayıt Ol
+          </Button>
+          <Button
+            type="button"
+            className="mt-6"
+            onClick={() => navigate("/login")}
+            outline
+          >
+            Giriş Yap
+          </Button>
+        </div>
       </form>
-      <Button type="submit" className="mt-10">
-        Kayıt Ol
-      </Button>
-      <Button
-        type="button"
-        className="mt-6"
-        onClick={() => navigate("/login")}
-        outline
-      >
-        Giriş Yap
-      </Button>
     </>
   );
 };

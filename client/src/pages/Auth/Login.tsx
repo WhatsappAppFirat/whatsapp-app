@@ -36,18 +36,20 @@ export const Login = () => {
           </label>
           <Input name="password" type="password" placeholder="Şifre" />
         </div>
+        <div className="text-center">
+          <Button type="submit" className="mt-10" onClick={() => navigate("/")}>
+            Giriş Yap
+          </Button>
+          <Button
+            type="button"
+            className="mt-6"
+            onClick={() => navigate("/register")}
+            outline
+          >
+            Kayıt Ol
+          </Button>
+        </div>
       </form>
-      <Button type="submit" className="mt-10">
-        Giriş Yap
-      </Button>
-      <Button
-        type="button"
-        className="mt-6"
-        onClick={() => navigate("/register")}
-        outline
-      >
-        Kayıt Ol
-      </Button>
     </>
   );
 };

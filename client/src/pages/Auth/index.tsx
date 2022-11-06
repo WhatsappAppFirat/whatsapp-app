@@ -1,8 +1,6 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
-import { Register } from "./Register";
 
-export const Auth = () => {
+export const Auth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="grid grid-cols-[40%_1fr] h-screen">
       <div className="flex flex-col items-center justify-center">
@@ -12,7 +10,7 @@ export const Auth = () => {
           width="100"
           height="100"
         />
-        <Outlet />
+        {children}
       </div>
       <div
         className="bg-primary bg-cover bg-center bg-blend-soft-light"
