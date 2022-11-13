@@ -4,6 +4,7 @@ import { Login } from "src/pages/Auth/Login";
 import { Register } from "src/pages/Auth/Register";
 import { Layout } from "src/components/Layout";
 import { Home } from "src/pages/Home";
+import { Verify } from "src/pages/Auth/Verify";
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +35,14 @@ export const router = createBrowserRouter([
         element: (
           <Auth>
             <Register />
+          </Auth>
+        ),
+      },
+      {
+        path: "/verify",
+        element: (
+          <Auth>
+            <Verify />
           </Auth>
         ),
       },

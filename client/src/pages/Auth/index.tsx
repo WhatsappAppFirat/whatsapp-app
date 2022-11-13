@@ -2,7 +2,7 @@ import React from "react";
 
 export const Auth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="grid grid-cols-[40%_1fr] h-screen">
+    <div className="grid grid-cols-[1fr_50%] h-screen">
       <div className="flex flex-col items-center justify-center">
         <img
           className="rounded-full bg-white shadow-md p-2 mb-12"

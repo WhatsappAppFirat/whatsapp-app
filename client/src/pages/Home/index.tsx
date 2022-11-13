@@ -1,4 +1,6 @@
 import React from "react";
+import { Button } from "src/components/Button";
+import { Input } from "src/components/Input";
 
 const Group: React.FC<{ title: string; link: string; verified?: boolean }> = ({
   title,
@@ -8,7 +10,7 @@ const Group: React.FC<{ title: string; link: string; verified?: boolean }> = ({
   return (
     <a
       href={link}
-      className="flex items-center justify-between gap-5 bg-white rounded-md p-4 shadow-md"
+      className="flex items-center justify-between gap-5 bg-white rounded-2xl p-4 shadow-md"
     >
       <div className="flex gap-2 items-center">
         <img
@@ -42,17 +44,31 @@ const Group: React.FC<{ title: string; link: string; verified?: boolean }> = ({
 export const Home = () => {
   return (
     <div className="text-center">
-      <h1 className="mt-20 text-3xl">Yazılım Mühendisliği için Gruplar</h1>
+      <h1 className="mt-20 text-3xl mb-4">Yazılım Mühendisliği için Gruplar</h1>
       <h4 className="text-gray-600">
         Aşağıdaki listede bulunan gruplardan size uygun olana katılabilirsiniz.
       </h4>
-      <div className="flex flex-col gap-6 mt-8 p-6 bg-slate-300 w-1/3 mx-auto rounded-md">
+      <div className="flex flex-col gap-6 mt-8 p-6 bg-slate-300 w-3/5 mx-auto rounded-xl">
+        <form className="flex w-2/3 mx-auto my-4">
+          <Input
+            type="text"
+            className="flex-1 rounded-r-none"
+            placeholder="https://chat.whatsapp.com/*******************"
+            pattern="(https:\/\/chat\.whatsapp\.com\/)\w+"
+          />
+          <Button className="w-12 min-w-min rounded-l-none">+</Button>
+        </form>
+
         <Group
           title="Yazılım Mühendisliği - Gündüz 1. Sınıf"
           link="#"
           verified
         />
-        <Group title="Yazılım Mühendisliği - Gündüz 2. Sınıf" link="#" />
+        <Group
+          title="Yazılım Mühendisliği - Gündüz 2. Sınıf"
+          link="#"
+          verified
+        />
         <Group
           title="Yazılım Mühendisliği - Gündüz 3. Sınıf"
           link="#"

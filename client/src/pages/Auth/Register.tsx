@@ -8,13 +8,13 @@ export const Register = () => {
   const navigate = useNavigate();
 
   return (
-    <>
-      <h2 className="text-4xl font-bold mb-8">Kayıt Ol</h2>
-      <h4 className="text-2xl mb-12 tracking-wider text-gray-600">
+    <div className="flex flex-col justify-center items-center text-center w-2/5">
+      <h2 className="text-4xl font-bold mb-5">Kayıt Ol</h2>
+      <h4 className="text-xl mb-12 tracking-wider text-gray-600">
         Okul epostan ile kayıt ol!
       </h4>
 
-      <form className="flex flex-col gap-6 w-2/4">
+      <form className="flex flex-col gap-6 w-full">
         <div className="flex flex-col gap-1">
           <label
             className="flex items-center gap-2 font-bold text-lg"
@@ -47,8 +47,12 @@ export const Register = () => {
           </label>
           <Input name="password" placeholder="Şifre" type="password" />
         </div>
-        <div className="text-center">
-          <Button type="submit" className="mt-10">
+        <div className="flex flex-col w-2/3 mx-auto text-center">
+          <Button
+            type="submit"
+            className="mt-10"
+            onClick={() => navigate("/verify")}
+          >
             Kayıt Ol
           </Button>
           <Button
@@ -61,6 +65,6 @@ export const Register = () => {
           </Button>
         </div>
       </form>
-    </>
+    </div>
   );
 };
