@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React from "react";
 
 export const Input: React.FC<React.ComponentPropsWithoutRef<"input">> = (
@@ -5,8 +6,11 @@ export const Input: React.FC<React.ComponentPropsWithoutRef<"input">> = (
 ) => {
   return (
     <input
-      className="border border-gray px-3 py-2 rounded-full tracking-wider shadow-sm"
       {...props}
+      className={clsx(
+        "border border-gray px-3 py-2 rounded-full bg-white tracking-wider shadow-sm outline-none",
+        props.className
+      )}
     />
   );
 };

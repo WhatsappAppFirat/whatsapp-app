@@ -3,7 +3,16 @@
 @tailwind utilities;
 
 body {
+    background: #FAFAFA;
     font-family: 'Source Sans Pro', sans-serif;
     font-size: 16px;
     color: #212121;
 }
+
+@layer base {
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+  }
