@@ -5,3 +5,11 @@ type NewGroupDTO struct {
 	Name           string `json:"group_name"`
 	Link           string `json:"link"`
 }
+
+type GroupDTO struct {
+	Name string `json:"group_name"`
+	Link string `json:"link"`
+}
+type GetGroupsDTO struct {
+	Groups []GroupDTO
+}

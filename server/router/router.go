@@ -32,5 +32,6 @@ func Init(router *echo.Echo, tx *mongo.Database, client *redis.Client) {
 	auth.POST("/group", groupHandler.NewGroup)
 	auth.POST("/department", groupHandler.NewDepartment)
 	auth.POST("/faculty", groupHandler.NewFaculty)
+	auth.GET("/groups", groupHandler.GetGroups)
 
 }

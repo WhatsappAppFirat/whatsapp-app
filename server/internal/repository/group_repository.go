@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+	"strconv"
 	models "whatsapp-app/model"
 
 	"github.com/kamva/mgm/v3"
@@ -42,4 +44,15 @@ func (g *GroupRepository) IsExist(link string) bool {
 		return false
 	}
 	return true
+}
+
+func (g *GroupRepository) FindByDepartmentID(ctx context.Context, departmentID string) ([]models.Group, error) {
+
+	code, _ := strconv.Atoi(departmentID)
+	groups := []models.Group{}
+	group := &models.Group{}
+
+	err := mgm.Coll(group).SimpleFind(&groups, bson.M{"department_code": code})
+
+	return groups, err
 }

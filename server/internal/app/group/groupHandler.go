@@ -2,6 +2,7 @@ package group
 
 import (
 	"net/http"
+	"strconv"
 	"whatsapp-app/dto/request"
 	groupService "whatsapp-app/internal/service/group"
 	"whatsapp-app/internal/utils"
@@ -15,6 +16,7 @@ type IGroupHandler interface {
 	NewFaculty(c echo.Context) error
 	NewDepartment(c echo.Context) error
 	NewGroup(c echo.Context) error
+	GetGroups(c echo.Context) error
 }
 
 type GroupHandler struct {
@@ -54,7 +56,6 @@ func (h *GroupHandler) NewDepartment(c echo.Context) error {
 	return c.JSON(http.StatusOK, response.Response(http.StatusOK, department))
 }
 
-
 func (h *GroupHandler) NewGroup(c echo.Context) error {
 	var request request.NewGroupDTO
 	if validate.Validator(&c, &request) != nil {
@@ -67,4 +68,18 @@ func (h *GroupHandler) NewGroup(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Response(http.StatusBadRequest, err.Error()))
 	}
 	return c.JSON(http.StatusOK, response.Response(http.StatusOK, group))
+}
+
+func (h *GroupHandler) GetGroups(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	user := h.utils.GetUser(&c)
+
+	schoolID := strconv.Itoa(int(user.SchoolID))
+	groups, err := h.service.GetGroups(ctx, schoolID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, response.Response(http.StatusBadRequest, err.Error()))
+	}
+	return c.JSON(http.StatusOK, response.Response(http.StatusOK, groups))
+
 }
