@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"errors"
 	"time"
 	models "whatsapp-app/model"
@@ -18,7 +17,7 @@ const (
 )
 
 type IUserRepository interface {
-	FindAllUser() ([]*models.User, error)
+	FindAllUser() ([]models.User, error)
 	IsDuplicateSchoolID(id int32) bool
 	CreateUser(newUser *models.User) error
 	Login(school_id int32) (*models.User, error)
@@ -42,32 +41,12 @@ func (u *UserRepository) CreateUser(newUser *models.User) error {
 	return err
 }
 
-func (u *UserRepository) FindAllUser() ([]*models.User, error) {
+func (u *UserRepository) FindAllUser() ([]models.User, error) {
 
-	var result []*models.User
-
-	ctx, cancel := context.WithTimeout(context.Background(), mongoQueryTimeout)
-	defer cancel()
-
+	var users []models.User
 	user := &models.User{}
-	coll := mgm.Coll(user)
-
-	cur, err := coll.Find(ctx, bson.M{})
-	if err != nil {
-		return nil, err
-	}
-	defer cur.Close(ctx)
-
-	for cur.Next(ctx) {
-		u := new(models.User)
-		if err := cur.Decode(u); err != nil {
-			return nil, err
-		}
-
-		result = append(result, u)
-	}
-
-	return result, cur.Err()
+	err := mgm.Coll(user).SimpleFind(&users, bson.M{})
+	return users, err
 }
 
 func (u *UserRepository) IsDuplicateSchoolID(id int32) bool {

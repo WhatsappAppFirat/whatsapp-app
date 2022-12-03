@@ -3,6 +3,7 @@ package group
 import (
 	"context"
 	"errors"
+	"strings"
 	"whatsapp-app/dto/request"
 	"whatsapp-app/dto/response"
 	"whatsapp-app/internal/service"
@@ -13,6 +14,7 @@ type IGroupService interface {
 	NewFaculty(ctx context.Context, request request.NewFacultyDTO) (response.NewFacultyDTO, error)
 	NewDepartment(ctx context.Context, request request.NewDepartmentDTO) (response.NewDepartmentDTO, error)
 	NewGroup(ctx context.Context, request request.NewGroupDTO) (response.NewGroupDTO, error)
+	GetGroups(ctx context.Context, schoolID string) (response.GetGroupsDTO, error)
 }
 
 type GroupService struct {
@@ -77,6 +79,7 @@ func (s *GroupService) NewDepartment(ctx context.Context, request request.NewDep
 	return response, nil
 
 }
+
 //TODO: Mongo'da foreign key'e bakılacak.
 func (s *GroupService) NewGroup(ctx context.Context, request request.NewGroupDTO) (response.NewGroupDTO, error) {
 	department, err := s.repository.Department.FindByID(request.DepartmentCode)
@@ -107,4 +110,30 @@ func (s *GroupService) NewGroup(ctx context.Context, request request.NewGroupDTO
 	}
 	return response, nil
 
+}
+func (s *GroupService) GetGroups(ctx context.Context, schoolID string) (response.GetGroupsDTO, error) {
+	str := strings.Split(schoolID, "")
+	strDep := str[3:6]
+
+	var departmentID string
+	for _, val := range strDep {
+		departmentID += val
+	}
+
+	groups, err := s.repository.Group.FindByDepartmentID(ctx, departmentID)
+	if err != nil {
+		return response.GetGroupsDTO{}, errors.New("Gruplar getirilemedi")
+	}
+	var getGroupsDTO response.GetGroupsDTO
+
+	for _, val := range groups {
+		group := response.GroupDTO{
+			Name: val.Name,
+			Link: val.Link,
+		}
+
+		getGroupsDTO.Groups = append(getGroupsDTO.Groups, group)
+	}
+
+	return getGroupsDTO, nil
 }

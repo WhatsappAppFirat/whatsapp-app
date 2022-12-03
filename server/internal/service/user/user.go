@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -78,7 +79,8 @@ func (s *UserService) Register(ctx context.Context, request request.UserRegister
 	}
 	err = s.repository.CreateUser(&newUser)
 	if err != nil {
-		return response.UserRegisterDTO{}, errors.New("Kullanıcı oluşturlamadı lütfen tekrar deneyiniz")
+		fmt.Println(err.Error())
+		return response.UserRegisterDTO{}, errors.New("Kullanıcı oluşturlamadı lütfen tekrar deneyiniz ")
 	}
 
 	response := response.UserRegisterDTO{
@@ -135,17 +137,17 @@ func (s *UserService) SendVerifyEmail(ctx context.Context, request request.UserV
 		return response.UserVerifyDTO{}, errors.New("Kullanıcı bulunamadı.")
 	}
 
-	err := s.Utils.SendEmail(request.Email, code)
+	key := "user-email:" + request.Email + "code:" + strconv.Itoa(code)
+	err := s.cache.Set(ctx, key, code, 180)
+	if err != nil {
+		return response.UserVerifyDTO{}, errors.New("Oluşturulan kod kaydedilirken hata meydana geldi lütfen tekrar deneyiniz")
+	}
+	
+	err = s.Utils.SendEmail(request.Email, code)
 	if err != nil {
 		return response.UserVerifyDTO{}, errors.New("E-Posta gönderilirken bir hata meydana geldi.")
 	}
 	message := "E-Posta başarıyla gönderildi."
-
-	key := "user-email:" + request.Email + "code:" + strconv.Itoa(code)
-	err = s.cache.Set(ctx, key, code, 180)
-	if err != nil {
-		return response.UserVerifyDTO{}, errors.New("Oluşturulan kod kaydedilirken hata meydana geldi lütfen tekrar deneyiniz")
-	}
 
 	return response.UserVerifyDTO{Message: message}, nil
 }

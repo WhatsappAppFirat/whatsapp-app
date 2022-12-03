@@ -29,7 +29,6 @@ func NewUserHandler(service userService.IUserService, utils utils.IUtils) IUserH
 		utils:   utils,
 	}
 }
-
 func (h *UserHandler) Register(c echo.Context) error {
 	var request request.UserRegisterDTO
 	if validate.Validator(&c, &request) != nil {
@@ -43,9 +42,7 @@ func (h *UserHandler) Register(c echo.Context) error {
 
 	}
 	return c.JSON(http.StatusOK, response.Response(http.StatusOK, user))
-
 }
-
 func (h *UserHandler) Login(c echo.Context) error {
 	var request request.UserLoginDTO
 	if validate.Validator(&c, &request) != nil {
@@ -59,7 +56,6 @@ func (h *UserHandler) Login(c echo.Context) error {
 
 	}
 	return c.JSON(http.StatusOK, response.Response(http.StatusOK, user))
-
 }
 func (h *UserHandler) SendEmail(c echo.Context) error {
 	var request request.UserVerifyDTO
@@ -75,7 +71,6 @@ func (h *UserHandler) SendEmail(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, response.Response(http.StatusOK, message))
 }
-
 func (h *UserHandler) VerifyEmail(c echo.Context) error {
 	var request request.UserVerifyEmailDTO
 	if validate.Validator(&c, &request) != nil {
@@ -90,4 +85,3 @@ func (h *UserHandler) VerifyEmail(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, response.Response(http.StatusOK, message))
 }
-
