@@ -1,6 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import useUser from "src/store/useUser";
 
 export const Auth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const navigate = useNavigate();
+  const isAuthenticated = useUser(state => state.isAuthenticated);
+
+  React.useEffect(() => {
+    if (isAuthenticated) navigate('/');
+  }, [isAuthenticated]);
+
   return (
     <div className="grid grid-cols-[1fr_50%] h-screen">
       <div className="flex flex-col items-center justify-center">
