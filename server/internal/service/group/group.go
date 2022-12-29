@@ -15,6 +15,7 @@ type IGroupService interface {
 	NewDepartment(ctx context.Context, request request.NewDepartmentDTO) (response.NewDepartmentDTO, error)
 	NewGroup(ctx context.Context, request request.NewGroupDTO) (response.NewGroupDTO, error)
 	GetGroups(ctx context.Context, schoolID string) (response.GetGroupsDTO, error)
+	VerifyGroup(ctx context.Context, request request.VerifyGroup) (response.GroupDTO, error)
 }
 
 type GroupService struct {
@@ -49,7 +50,6 @@ func (s *GroupService) NewFaculty(ctx context.Context, request request.NewFacult
 	return response, nil
 
 }
-
 func (s *GroupService) NewDepartment(ctx context.Context, request request.NewDepartmentDTO) (response.NewDepartmentDTO, error) {
 	faculty, err := s.repository.Faculty.FindByID(request.FacultyCode)
 	if err != nil {
@@ -88,6 +88,7 @@ func (s *GroupService) NewGroup(ctx context.Context, request request.NewGroupDTO
 
 	}
 
+	//Compasite
 	isExist := s.repository.Group.IsExist(request.Link)
 	if isExist {
 		return response.NewGroupDTO{}, errors.New("Link zaten var.")
@@ -98,6 +99,8 @@ func (s *GroupService) NewGroup(ctx context.Context, request request.NewGroupDTO
 		DepartmentCode: request.DepartmentCode,
 		Link:           request.Link,
 	}
+
+	//Factory design pattern
 
 	err = s.repository.Group.Create(group)
 	if err != nil {
@@ -124,16 +127,36 @@ func (s *GroupService) GetGroups(ctx context.Context, schoolID string) (response
 	if err != nil {
 		return response.GetGroupsDTO{}, errors.New("Gruplar getirilemedi")
 	}
+
 	var getGroupsDTO response.GetGroupsDTO
 
 	for _, val := range groups {
-		group := response.GroupDTO{
-			Name: val.Name,
-			Link: val.Link,
-		}
+		getGroupsDTO.Groups = append(getGroupsDTO.Groups, response.GroupDTO{
 
-		getGroupsDTO.Groups = append(getGroupsDTO.Groups, group)
+			Name:       val.Name,
+			Link:       val.Link,
+			IsVerified: val.IsVerified,
+		})
 	}
-
+	//Facade design pattern
 	return getGroupsDTO, nil
+}
+func (s *GroupService) VerifyGroup(ctx context.Context, request request.VerifyGroup) (response.GroupDTO, error) {
+	group, err := s.repository.Group.FindByID(request.ID)
+	if err != nil {
+		return response.GroupDTO{}, errors.New("Grup bulunamadı, lütfen tekrar deneyiniz.")
+
+	}
+	if request.IsVerify == group.IsVerified {
+		return response.GroupDTO{}, errors.New("Hatalı istek, lütfen tekrar deneyiniz.")
+	}
+	group.IsVerified = request.IsVerify
+	s.repository.Group.UpdateGroup(group)
+	response := response.GroupDTO{
+		Name:       group.Name,
+		Link:       group.Link,
+		IsVerified: group.IsVerified,
+	}
+	return response, nil
+
 }

@@ -7,8 +7,10 @@ type NewGroupDTO struct {
 }
 
 type GroupDTO struct {
-	Name string `json:"group_name"`
-	Link string `json:"link"`
+	ID         string `json:"id"`
+	Name       string `json:"group_name"`
+	Link       string `json:"link"`
+	IsVerified bool   `json:"is_verified"`
 }
 type GetGroupsDTO struct {
 	Groups []GroupDTO

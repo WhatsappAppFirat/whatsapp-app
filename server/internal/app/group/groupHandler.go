@@ -1,6 +1,8 @@
 package group
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"whatsapp-app/dto/request"
@@ -17,6 +19,7 @@ type IGroupHandler interface {
 	NewDepartment(c echo.Context) error
 	NewGroup(c echo.Context) error
 	GetGroups(c echo.Context) error
+	VerifyGroup(c echo.Context) error
 }
 
 type GroupHandler struct {
@@ -63,7 +66,6 @@ func (h *GroupHandler) NewGroup(c echo.Context) error {
 	}
 	ctx := c.Request().Context()
 	group, err := h.service.NewGroup(ctx, request)
-
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, response.Response(http.StatusBadRequest, err.Error()))
 	}
@@ -81,5 +83,28 @@ func (h *GroupHandler) GetGroups(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.Response(http.StatusBadRequest, err.Error()))
 	}
 	return c.JSON(http.StatusOK, response.Response(http.StatusOK, groups))
+
+}
+func (h *GroupHandler) VerifyGroup(c echo.Context) error {
+	var request request.VerifyGroup
+	if validate.Validator(&c, &request) != nil {
+		return nil
+	}
+
+	ctx := c.Request().Context()
+
+	user := h.utils.GetUser(&c)
+	fmt.Println("user:", user)
+	if !user.IsAdmin {
+		err := errors.New("Yetkisiz kullanıcı")
+
+		return c.JSON(http.StatusBadRequest, response.Response(http.StatusBadRequest, err.Error()))
+	}
+	group, err := h.service.VerifyGroup(ctx, request)
+	if err != nil {
+		fmt.Println("desds")
+		return c.JSON(http.StatusBadRequest, response.Response(http.StatusBadRequest, err))
+	}
+	return c.JSON(http.StatusOK, response.Response(http.StatusOK, group))
 
 }

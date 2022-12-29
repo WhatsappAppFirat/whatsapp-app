@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -24,7 +23,7 @@ import (
 type IUserService interface {
 	Register(ctx context.Context, userRegisterRequest request.UserRegisterDTO) (response.UserRegisterDTO, error)
 	Login(ctx context.Context, userLoginRequest request.UserLoginDTO) (response.UserLoginDTO, error)
-	SendVerifyEmail(ctx context.Context, userVerifyRequest request.UserVerifyDTO) (response.UserVerifyDTO, error)
+	//SendVerifyEmail(ctx context.Context, userVerifyRequest request.UserVerifyDTO) (response.UserVerifyDTO, error)
 	VerifyUserEmail(ctx context.Context, userVerifyRequest request.UserVerifyEmailDTO) (response.UserVerifyDTO, error)
 }
 
@@ -46,7 +45,6 @@ func (s *UserService) Register(ctx context.Context, request request.UserRegister
 
 	school_id, err := strconv.Atoi(findSchoolID[0])
 	if err != nil {
-
 		return response.UserRegisterDTO{}, errors.New("Kullanıcı oluşturlamadı lütfen tekrar deneyiniz")
 	}
 
@@ -71,7 +69,6 @@ func (s *UserService) Register(ctx context.Context, request request.UserRegister
 
 	newUser := models.User{
 		Name:     request.Name,
-		Surname:  request.Surname,
 		Password: hashPassword,
 		SchoolID: int32(school_id),
 		Email:    request.Email,
@@ -79,36 +76,62 @@ func (s *UserService) Register(ctx context.Context, request request.UserRegister
 	}
 	err = s.repository.CreateUser(&newUser)
 	if err != nil {
-		fmt.Println(err.Error())
 		return response.UserRegisterDTO{}, errors.New("Kullanıcı oluşturlamadı lütfen tekrar deneyiniz ")
 	}
 
-	response := response.UserRegisterDTO{
-
+	responses := response.UserRegisterDTO{
 		Name:     newUser.Name,
-		Surname:  newUser.Surname,
 		Email:    newUser.Email,
 		SchoolID: newUser.SchoolID,
 	}
-	return response, nil
+
+	code := s.Utils.RandNumber(100000, 999999)
+
+	key := "user-email:" + request.Email + "code:" + strconv.Itoa(code)
+	err = s.cache.Set(ctx, key, code, 180)
+	if err != nil {
+		return response.UserRegisterDTO{}, errors.New("Oluşturulan kod kaydedilirken hata meydana geldi lütfen tekrar deneyiniz")
+	}
+
+	err = s.Utils.SendEmail(request.Email, code)
+	if err != nil {
+		return response.UserRegisterDTO{}, errors.New("E-Posta gönderilirken bir hata meydana geldi.")
+	}
+
+	return responses, nil
 
 }
 
 func (s *UserService) Login(ctx context.Context, request request.UserLoginDTO) (response.UserLoginDTO, error) {
 
-	school_id := s.Utils.SplitSchoolID(request.SchoolID)
+	school_id := s.Utils.SplitSchoolID(request.Email)
 	user, err := s.repository.Login(int32(school_id))
 	if err != nil {
 		return response.UserLoginDTO{}, err
 	}
 
-	if !user.Verified {
-		return response.UserLoginDTO{}, errors.New("Giriş yapmak için lütfen önce e-mail doğrulaması yapınız.")
-	}
-
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
 	if err != nil {
-		return response.UserLoginDTO{}, err
+		return response.UserLoginDTO{}, errors.New("Kullanıcı adı veya parola hatalı lütfen tekrar deneyiniz.")
+	}
+
+	if !user.Verified {
+
+		code := s.Utils.RandNumber(100000, 999999)
+		key := "user-email:" + request.Email + "code:" + strconv.Itoa(code)
+		err = s.cache.Set(ctx, key, code, 180)
+		if err != nil {
+			return response.UserLoginDTO{}, errors.New("Oluşturulan kod kaydedilirken hata meydana geldi lütfen tekrar deneyiniz")
+		}
+
+		err = s.Utils.SendEmail(request.Email, code)
+		if err != nil {
+			return response.UserLoginDTO{}, errors.New("E-Posta gönderilirken bir hata meydana geldi.")
+		}
+		var userLoginResponse response.UserLoginDTO
+		userLoginResponse.Convert(user, "")
+
+		return userLoginResponse, errors.New("Giriş yapmak için lütfen önce e-mail doğrulaması yapınız.")
 	}
 
 	claims := &jwtPackage.JwtCustomClaims{
@@ -129,6 +152,7 @@ func (s *UserService) Login(ctx context.Context, request request.UserLoginDTO) (
 	return userLoginResponse, nil
 }
 
+/*
 func (s *UserService) SendVerifyEmail(ctx context.Context, request request.UserVerifyDTO) (response.UserVerifyDTO, error) {
 	code := s.Utils.RandNumber(100000, 999999)
 
@@ -142,7 +166,7 @@ func (s *UserService) SendVerifyEmail(ctx context.Context, request request.UserV
 	if err != nil {
 		return response.UserVerifyDTO{}, errors.New("Oluşturulan kod kaydedilirken hata meydana geldi lütfen tekrar deneyiniz")
 	}
-	
+
 	err = s.Utils.SendEmail(request.Email, code)
 	if err != nil {
 		return response.UserVerifyDTO{}, errors.New("E-Posta gönderilirken bir hata meydana geldi.")
@@ -150,7 +174,7 @@ func (s *UserService) SendVerifyEmail(ctx context.Context, request request.UserV
 	message := "E-Posta başarıyla gönderildi."
 
 	return response.UserVerifyDTO{Message: message}, nil
-}
+}*/
 
 func (s *UserService) VerifyUserEmail(ctx context.Context, request request.UserVerifyEmailDTO) (response.UserVerifyDTO, error) {
 
