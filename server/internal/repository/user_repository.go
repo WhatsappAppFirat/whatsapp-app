@@ -86,7 +86,6 @@ func (u *UserRepository) Login(school_id int32) (*models.User, error) {
 
 func (u *UserRepository) UpdateUser(user *models.User) error {
 	err := mgm.Coll(user).Update(user)
-
 	return err
 }
 

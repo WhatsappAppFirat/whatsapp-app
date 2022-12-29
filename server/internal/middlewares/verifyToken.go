@@ -14,12 +14,12 @@ func VerifyToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tokenUser, ok := c.Get("user").(*jwt.Token)
 		if !ok {
-			return c.JSON(403, response.Response(403, "Oturum bulunamadı."))
+			return c.JSON(401, response.Response(401, "Oturum bulunamadı."))
 		}
 
 		claims, ok := tokenUser.Claims.(*models.JWTCustomClaims)
 		if !ok {
-			return c.JSON(403, response.Response(403, "Oturum bulunamadı."))
+			return c.JSON(401, response.Response(401, "Oturum bulunamadı."))
 		}
 
 		db := db.Connect()
