@@ -47,7 +47,6 @@ func (g *GroupRepository) IsExist(link string) bool {
 }
 
 func (g *GroupRepository) FindByDepartmentID(ctx context.Context, departmentID string) ([]models.Group, error) {
-
 	code, _ := strconv.Atoi(departmentID)
 	groups := []models.Group{}
 	group := &models.Group{}
@@ -55,4 +54,9 @@ func (g *GroupRepository) FindByDepartmentID(ctx context.Context, departmentID s
 	err := mgm.Coll(group).SimpleFind(&groups, bson.M{"department_code": code})
 
 	return groups, err
+}
+
+func (g *GroupRepository) UpdateGroup(group *models.Group) error {
+	err := mgm.Coll(group).Update(group)
+	return err
 }
