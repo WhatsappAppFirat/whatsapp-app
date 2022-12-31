@@ -6,10 +6,10 @@ export const Input: React.FC<React.ComponentPropsWithoutRef<"input">> = (
 ) => {
   return (
     <input
-      {...props}
-      className={clsx(
-        "border border-gray px-3 py-2 rounded-full bg-white tracking-wider shadow-sm outline-none",
-        props.className
+    {...props}
+    className={clsx(
+      "border border-gray px-3 py-2 rounded-full bg-white tracking-wider shadow-sm outline-none",
+      props.className
       )}
     />
   );

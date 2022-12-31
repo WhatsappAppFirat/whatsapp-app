@@ -1,42 +1,47 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "src/components/Button";
-import { Input } from "src/components/Input";
+import { authActions } from "src/service/auth";
+import toast from "react-hot-toast";
+import OtpInput from "react18-input-otp";
 
 export const Verify = () => {
+  const [otp, setOtp] = React.useState("");
   const [timer, setTimer] = React.useState(180);
-  const [code, setCode] = React.useState<number[]>(Array(6).fill(""));
   const navigate = useNavigate();
 
-  console.log(timer);
+  const url = new URL(window.location.href).search;
+  const params = new URLSearchParams(url);
+  const email = params.get("email");
 
   React.useEffect(() => {
     const timeout = setInterval(() => {
       setTimer((t) => t - 1);
-      if (timer === 0) {
-        clearTimeout(timeout);
-        navigate("/");
-      }
     }, 1000);
 
     return () => clearTimeout(timeout);
   }, []);
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const numberInput = +(e.currentTarget.getAttribute("name") as string);
+  React.useEffect(() => {
+    if (timer < 0 || !email) window.location.replace("/login");
+  }, [timer, email]);
 
-    const newCode = code.map((c, idx) => {
-      if (idx === numberInput - 1) return +e.target.value.slice(-1);
-      return c;
-    });
+  const onSubmit = (
+    e: React.SyntheticEvent<HTMLFormElement | HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+    if (!email) return toast.error("E-posta bulunamadı");
 
-    setCode(newCode);
-
-    const nextInput = document.querySelector<HTMLInputElement>(
-      `input[name="${numberInput + 1}"]`
-    );
-
-    if (nextInput) nextInput.focus();
+    authActions
+      .verify({
+        code: otp,
+        email,
+      })
+      .then(() => {
+        toast.success("Doğrulama işlemi başarılı!");
+        setTimeout(() => navigate("/login"), 2000);
+      })
+      .catch(() => toast.error("Geçersiz doğrulama kodu!"));
   };
 
   return (
@@ -45,32 +50,33 @@ export const Verify = () => {
       <h4 className="text-xl mb-12 tracking-wider text-gray-600">
         Lütfen mail adresinize gelen doğrulama kodunu giriniz.
       </h4>
-
-      <form className="flex flex-col gap-6">
+      <form className="flex flex-col gap-6" onSubmit={onSubmit}>
         <div className="flex flex-col">
-          <div className="flex flex-row gap-4" id="verify-wrapper">
-            {code.map((value, idx) => (
-              <Input
-                value={value}
-                className="p-7 w-14 h-14 text-2xl text-center rounded-md"
-                name={String(idx + 1)}
-                type="number"
-                placeholder="*"
-                maxLength={1}
-                onChange={onChange}
-                key={idx}
-              />
-            ))}
+          <div className="flex justify-center" id="verify-wrapper">
+            <OtpInput
+              value={otp}
+              onChange={setOtp}
+              numInputs={6}
+              separator={<span className="mx-2">-</span>}
+              inputStyle={{
+                height: "50px",
+                width: "50px",
+                border: "1px solid gray",
+                borderRadius: "6px",
+              }}
+              placeholder="******"
+              shouldAutoFocus
+            />
           </div>
           <div className="my-2 flex justify-between text-primary font-semibold">
-            <button className="text-lg">Kodu tekrar gönder</button>
+            <div />
             <div className="text-lg">
               Kalan süre: <span className="font-thin">{timer}</span>
             </div>
           </div>
         </div>
         <div className="flex flex-col w-2/3 mx-auto">
-          <Button type="submit" className="mt-10">
+          <Button onSubmit={onSubmit} type="submit" className="mt-10">
             Doğrula
           </Button>
         </div>

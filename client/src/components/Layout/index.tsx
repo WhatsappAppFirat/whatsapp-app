@@ -11,7 +11,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
 
   React.useEffect(() => {
     if (!isAuthenticated) navigate('/login');
-  }, []);
+  }, [isAuthenticated]);
 
 
   return (

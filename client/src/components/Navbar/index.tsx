@@ -3,6 +3,7 @@ import useUser from "src/store/useUser";
 
 export const Navbar = () => {
   const user = useUser((state) => state.user);
+  const logout = useUser((state) => state.logout);
 
   return (
     <div className="bg-primary text-white font-semibold text-xl flex text-center justify-between pr-3 items-center shadow-md">
@@ -19,7 +20,10 @@ export const Navbar = () => {
           Teknoloji Fakültesi / Yazılım Mühendisliği (M.T.O.K)
         </div>
       </div>
-      <a href="#">{user?.name}</a>
+      <div>
+        <a href="#" className="mr-8">{user?.name}</a>
+        <button onClick={logout}>Çıkış Yap</button>
+      </div>
     </div>
   );
 };
