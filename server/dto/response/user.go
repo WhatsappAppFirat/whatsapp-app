@@ -19,6 +19,7 @@ type UserLoginDTO struct {
 	SchoolID int32              `json:"school_id"`
 	Email    string             `json:"email"`
 	Verified bool               `json:"verified"`
+	Admin    bool               `json:"admin"`
 	Token    string             `json:"token"`
 }
 
@@ -29,7 +30,7 @@ func (u *UserLoginDTO) Convert(user *models.User, token string) {
 	u.SchoolID = user.SchoolID
 	u.Verified = user.Verified
 	u.Token = token
-
+	u.Admin = user.IsAdmin
 }
 
 type UserVerifyDTO struct {

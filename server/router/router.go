@@ -37,6 +37,6 @@ func Init(router *echo.Echo, tx *mongo.Database, client *redis.Client) {
 	auth.POST("/department", groupHandler.NewDepartment)
 	auth.POST("/faculty", groupHandler.NewFaculty)
 	auth.GET("/groups", groupHandler.GetGroups)
-	auth.PUT("/verify/group", groupHandler.VerifyGroup)
-	auth.DELETE("/group", groupHandler.DeleteGroup)
+	auth.PUT("/verify/group/:group_id", groupHandler.VerifyGroup)
+	auth.DELETE("/group/:group_id", groupHandler.DeleteGroup)
 }

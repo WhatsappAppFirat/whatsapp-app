@@ -3,7 +3,6 @@ package group
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"whatsapp-app/dto/request"
 	"whatsapp-app/dto/response"
@@ -145,7 +144,6 @@ func (s *GroupService) GetGroups(ctx context.Context, schoolID string) (response
 }
 
 func (s *GroupService) VerifyGroup(ctx context.Context, request request.VerifyGroup) (response.GroupDTO, error) {
-	fmt.Println("id", request.ID)
 	group, err := s.repository.Group.FindByIDStr(request.ID)
 	if err != nil {
 		return response.GroupDTO{}, errors.New("Grup bulunamadı, lütfen tekrar deneyiniz.")
@@ -154,7 +152,6 @@ func (s *GroupService) VerifyGroup(ctx context.Context, request request.VerifyGr
 	if request.IsVerify == 1 {
 		if group.IsVerified == true {
 			return response.GroupDTO{}, errors.New("Grup zaten doğrulanmış.")
-
 		}
 		group.IsVerified = true
 	}

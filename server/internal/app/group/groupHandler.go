@@ -85,10 +85,12 @@ func (h *GroupHandler) GetGroups(c echo.Context) error {
 }
 
 func (h *GroupHandler) VerifyGroup(c echo.Context) error {
+	id := c.Param("group_id")
 	var request request.VerifyGroup
 	if validate.Validator(&c, &request) != nil {
 		return nil
 	}
+	request.ID = id
 	ctx := c.Request().Context()
 	user := h.utils.GetUser(&c)
 	if !user.IsAdmin {
@@ -104,6 +106,7 @@ func (h *GroupHandler) VerifyGroup(c echo.Context) error {
 }
 
 func (h *GroupHandler) DeleteGroup(c echo.Context) error {
+	id := c.Param("group_id")
 	var request request.DeleteGroup
 	if validate.Validator(&c, &request) != nil {
 		return nil
@@ -113,6 +116,7 @@ func (h *GroupHandler) DeleteGroup(c echo.Context) error {
 		err := errors.New("Yetkisiz kullanıcı")
 		return c.JSON(http.StatusBadRequest, response.Response(http.StatusBadRequest, err.Error()))
 	}
+	request.ID = id
 	ctx := c.Request().Context()
 	err := h.service.DeleteGroup(ctx, request)
 	if err != nil {
