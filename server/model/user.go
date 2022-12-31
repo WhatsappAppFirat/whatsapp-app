@@ -21,6 +21,7 @@ func NewUser(user *User) *User {
 		SchoolID: user.SchoolID,
 		Email:    user.Email,
 		Password: user.Password,
+		ApiKey: user.ApiKey,
 	}
 }
 

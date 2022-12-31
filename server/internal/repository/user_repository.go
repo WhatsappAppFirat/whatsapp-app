@@ -19,7 +19,7 @@ const (
 type IUserRepository interface {
 	FindAllUser() ([]models.User, error)
 	IsDuplicateSchoolID(id int32) bool
-	CreateUser(newUser *models.User) error
+	CreateUser(newUser models.User) error
 	Login(school_id int32) (*models.User, error)
 	FindUserWithEmail(email string) (*models.User, error)
 	IsExistWithEmail(email string) bool
@@ -35,8 +35,8 @@ func NewUserRepository(db *mongo.Database) IUserRepository {
 	return &UserRepository{db: db}
 }
 
-func (u *UserRepository) CreateUser(newUser *models.User) error {
-	user := models.NewUser(newUser)
+func (u *UserRepository) CreateUser(newUser models.User) error {
+	user := models.NewUser(&newUser)
 	err := mgm.Coll(user).Create(user)
 	return err
 }

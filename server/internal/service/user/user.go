@@ -12,7 +12,6 @@ import (
 	configs "whatsapp-app/internal/config"
 	"whatsapp-app/internal/repository"
 	"whatsapp-app/internal/service"
-	jwtPackage "whatsapp-app/internal/utils/jwt"
 	models "whatsapp-app/model"
 
 	"github.com/golang-jwt/jwt"
@@ -74,7 +73,8 @@ func (s *UserService) Register(ctx context.Context, request request.UserRegister
 		Email:    request.Email,
 		ApiKey:   apiKey,
 	}
-	err = s.repository.CreateUser(&newUser)
+	newUser.ApiKey = apiKey
+	err = s.repository.CreateUser(newUser)
 	if err != nil {
 		return response.UserRegisterDTO{}, errors.New("Kullanıcı oluşturlamadı lütfen tekrar deneyiniz ")
 	}
@@ -84,19 +84,19 @@ func (s *UserService) Register(ctx context.Context, request request.UserRegister
 		Email:    newUser.Email,
 		SchoolID: newUser.SchoolID,
 	}
+	/*
+		code := s.Utils.RandNumber(100000, 999999)
 
-	code := s.Utils.RandNumber(100000, 999999)
+		key := "user-email:" + request.Email + "code:" + strconv.Itoa(code)
+		err = s.cache.Set(ctx, key, code, 180)
+		if err != nil {
+			return response.UserRegisterDTO{}, errors.New("Oluşturulan kod kaydedilirken hata meydana geldi lütfen tekrar deneyiniz")
+		}
 
-	key := "user-email:" + request.Email + "code:" + strconv.Itoa(code)
-	err = s.cache.Set(ctx, key, code, 180)
-	if err != nil {
-		return response.UserRegisterDTO{}, errors.New("Oluşturulan kod kaydedilirken hata meydana geldi lütfen tekrar deneyiniz")
-	}
-
-	err = s.Utils.SendEmail(request.Email, code)
-	if err != nil {
-		return response.UserRegisterDTO{}, errors.New("E-Posta gönderilirken bir hata meydana geldi.")
-	}
+		err = s.Utils.SendEmail(request.Email, code)
+		if err != nil {
+			return response.UserRegisterDTO{}, errors.New("E-Posta gönderilirken bir hata meydana geldi.")
+		}*/
 
 	return responses, nil
 
@@ -134,8 +134,8 @@ func (s *UserService) Login(ctx context.Context, request request.UserLoginDTO) (
 		return userLoginResponse, errors.New("Giriş yapmak için lütfen önce e-mail doğrulaması yapınız.")
 	}
 
-	claims := &jwtPackage.JwtCustomClaims{
-		ID: user.ID,
+	claims := &models.JWTCustomClaims{
+		ApiKey: user.ApiKey,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 24 * 5).Unix(),
 		},

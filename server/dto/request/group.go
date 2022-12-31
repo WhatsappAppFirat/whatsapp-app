@@ -6,6 +6,10 @@ type NewGroupDTO struct {
 	Link           string `json:"link" validate:"required"`
 }
 type VerifyGroup struct {
-	ID       uint16 `json:"id" validate:"required"`
-	IsVerify bool  `json:"is_verify" validate:"required"`
+	ID       string `json:"id" validate:"required"`
+	IsVerify uint   `json:"is_verify" validate:"required"`
+}
+
+type DeleteGroup struct {
+	ID string `json:"id" validate:"required" param:"id" query:"id"`
 }

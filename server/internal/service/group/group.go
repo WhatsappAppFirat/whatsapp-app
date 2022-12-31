@@ -3,6 +3,7 @@ package group
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"whatsapp-app/dto/request"
 	"whatsapp-app/dto/response"
@@ -16,6 +17,7 @@ type IGroupService interface {
 	NewGroup(ctx context.Context, request request.NewGroupDTO) (response.NewGroupDTO, error)
 	GetGroups(ctx context.Context, schoolID string) (response.GetGroupsDTO, error)
 	VerifyGroup(ctx context.Context, request request.VerifyGroup) (response.GroupDTO, error)
+	DeleteGroup(ctx context.Context, request request.DeleteGroup) error
 }
 
 type GroupService struct {
@@ -132,7 +134,7 @@ func (s *GroupService) GetGroups(ctx context.Context, schoolID string) (response
 
 	for _, val := range groups {
 		getGroupsDTO.Groups = append(getGroupsDTO.Groups, response.GroupDTO{
-
+			ID:         val.ID.Hex(),
 			Name:       val.Name,
 			Link:       val.Link,
 			IsVerified: val.IsVerified,
@@ -141,22 +143,49 @@ func (s *GroupService) GetGroups(ctx context.Context, schoolID string) (response
 	//Facade design pattern
 	return getGroupsDTO, nil
 }
+
 func (s *GroupService) VerifyGroup(ctx context.Context, request request.VerifyGroup) (response.GroupDTO, error) {
-	group, err := s.repository.Group.FindByID(request.ID)
+	fmt.Println("id", request.ID)
+	group, err := s.repository.Group.FindByIDStr(request.ID)
 	if err != nil {
 		return response.GroupDTO{}, errors.New("Grup bulunamadı, lütfen tekrar deneyiniz.")
 
 	}
-	if request.IsVerify == group.IsVerified {
-		return response.GroupDTO{}, errors.New("Hatalı istek, lütfen tekrar deneyiniz.")
+	if request.IsVerify == 1 {
+		if group.IsVerified == true {
+			return response.GroupDTO{}, errors.New("Grup zaten doğrulanmış.")
+
+		}
+		group.IsVerified = true
 	}
-	group.IsVerified = request.IsVerify
-	s.repository.Group.UpdateGroup(group)
+	if request.IsVerify == 2 {
+		group.IsVerified = false
+	}
+
+	err = s.repository.Group.UpdateGroup(group)
+	if err != nil {
+		return response.GroupDTO{}, errors.New("Istek başarısız, lütfen tekrar deneyiniz.")
+
+	}
+
 	response := response.GroupDTO{
+		ID:         group.ID.Hex(),
 		Name:       group.Name,
 		Link:       group.Link,
 		IsVerified: group.IsVerified,
 	}
 	return response, nil
 
+}
+
+func (s *GroupService) DeleteGroup(ctx context.Context, request request.DeleteGroup) error {
+	group, err := s.repository.Group.FindByIDStr(request.ID)
+	if err != nil {
+		return errors.New("Grup bulunamadı, lütfen tekrar deneyiniz.")
+	}
+	err = s.repository.Group.DeleteGroup(group)
+	if err != nil {
+		return errors.New("Grup silinemedi, lütfen tekrar deneyiniz.")
+	}
+	return nil
 }

@@ -23,7 +23,6 @@ func VerifyToken(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		db := db.Connect()
-
 		verifiedUser, err := repository.NewUserRepository(db).FindWithApiKey(claims.ApiKey)
 		if err != nil {
 			return c.JSON(401, response.Response(401, "Kullanıcı bulunamadı."))

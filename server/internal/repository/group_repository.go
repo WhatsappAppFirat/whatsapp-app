@@ -37,6 +37,12 @@ func (g *GroupRepository) FindByID(id uint16) (*models.Group, error) {
 	return group, err
 }
 
+func (g *GroupRepository) FindByIDStr(id string) (*models.Group, error) {
+	group := &models.Group{}
+	err := mgm.Coll(group).FindByID(id, group)
+
+	return group, err
+}
 func (g *GroupRepository) IsExist(link string) bool {
 	group := &models.Group{}
 	err := mgm.Coll(group).First(bson.M{"link": link}, group)
@@ -58,5 +64,10 @@ func (g *GroupRepository) FindByDepartmentID(ctx context.Context, departmentID s
 
 func (g *GroupRepository) UpdateGroup(group *models.Group) error {
 	err := mgm.Coll(group).Update(group)
+	return err
+}
+
+func (g *GroupRepository) DeleteGroup(group *models.Group) error {
+	err := mgm.Coll(group).Delete(group)
 	return err
 }
