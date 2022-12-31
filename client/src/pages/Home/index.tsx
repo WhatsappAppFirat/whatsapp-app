@@ -1,16 +1,27 @@
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { Button } from "src/components/Button";
 import { Input } from "src/components/Input";
+import { groupActions } from "src/service/groups";
+import { IoMdCheckmark, IoMdClose } from "react-icons/io";
+import useUser from "src/store/useUser";
+import { AiOutlineDelete } from "react-icons/ai";
 
-const Group: React.FC<{ title: string; link: string; verified?: boolean }> = ({
-  title,
-  link,
-  verified = false,
-}) => {
+const Group: React.FC<{
+  id: string;
+  title: string;
+  link: string;
+  verified?: boolean;
+  refetch: () => void;
+}> = ({ id, title, link, verified = false, refetch }) => {
+  const user = useUser((state) => state.user);
+
   return (
     <a
       href={link}
       className="flex items-center justify-between gap-5 bg-white rounded-2xl p-4 shadow-md"
+      target="_blank"
+      rel="noreferrer"
     >
       <div className="flex gap-2 items-center">
         <img
@@ -22,26 +33,59 @@ const Group: React.FC<{ title: string; link: string; verified?: boolean }> = ({
         <span className="font-bold">{title}</span>
       </div>
 
-      {verified ? (
-        <img
-          width="50"
-          height="50"
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Twitter_Verified_Badge.svg/640px-Twitter_Verified_Badge.svg.png"
-        ></img>
-      ) : (
-        <img
-          className="opacity-30"
-          width="50"
-          height="50"
-          src="https://cdn-icons-png.flaticon.com/512/5184/5184592.png"
-          alt="unverified"
-        />
-      )}
+      <div className="flex gap-2">
+        {verified && (
+          <img
+            width="50"
+            height="50"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Twitter_Verified_Badge.svg/640px-Twitter_Verified_Badge.svg.png"
+          ></img>
+        )}
+        {!verified && user?.admin && (
+          <button
+            className="border border-green bg-green-500 p-4 rounded-full text-white text-xl"
+            onClick={(e) => {
+              e.preventDefault();
+              groupActions.updateGroup(id, true).then(refetch);
+            }}
+          >
+            <IoMdCheckmark />
+          </button>
+        )}
+
+        {user?.admin && (
+          <button
+            className="border border-red bg-red-500 p-4 rounded-full text-white text-xl"
+            onClick={(e) => {
+              e.preventDefault();
+              groupActions.updateGroup(id, false).then(refetch);
+            }}
+          >
+            <IoMdClose />
+          </button>
+        )}
+
+        {user?.admin && (
+          <button
+            className="border border-red-800 p-4 rounded-full text-red-800 text-xl"
+            onClick={(e) => {
+              e.preventDefault();
+              groupActions.deleteGroup(id).then(refetch);
+            }}
+          >
+            <AiOutlineDelete />
+          </button>
+        )}
+      </div>
     </a>
   );
 };
 
 export const Home = () => {
+  const { data, isFetching, refetch } = useQuery(["groups"], () =>
+    groupActions.getGroups()
+  );
+
   return (
     <div className="text-center">
       <h1 className="mt-20 text-3xl mb-4">Yazılım Mühendisliği için Gruplar</h1>
@@ -53,29 +97,23 @@ export const Home = () => {
           <Input
             type="text"
             className="flex-1 rounded-r-none"
-            placeholder="https://chat.whatsapp.com/*******************"
+            placeholder="https://chat.whatsapp.com/*"
             pattern="(https:\/\/chat\.whatsapp\.com\/)\w+"
           />
           <Button className="w-12 min-w-min rounded-l-none">+</Button>
         </form>
-
-        <Group
-          title="Yazılım Mühendisliği - Gündüz 1. Sınıf"
-          link="#"
-          verified
-        />
-        <Group
-          title="Yazılım Mühendisliği - Gündüz 2. Sınıf"
-          link="#"
-          verified
-        />
-        <Group
-          title="Yazılım Mühendisliği - Gündüz 3. Sınıf"
-          link="#"
-          verified
-        />
-        <Group title="Yazılım Mühendisliği - Gündüz 4. Sınıf" link="#" />
-        <Group title="Yazılım Mühendisliği - Gece 1. Sınıf" link="#" />
+        {isFetching && "Gruplar yükleniyor..."}
+        {!isFetching &&
+          data?.data?.data?.Groups?.map((group, idx) => (
+            <Group
+              id={group.id}
+              title={group.group_name}
+              link={group.link}
+              verified={group.is_verified}
+              key={group.id}
+              refetch={refetch}
+            />
+          ))}
       </div>
     </div>
   );

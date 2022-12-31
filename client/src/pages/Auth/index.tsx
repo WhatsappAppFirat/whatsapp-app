@@ -5,9 +5,11 @@ import useUser from "src/store/useUser";
 export const Auth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const isAuthenticated = useUser(state => state.isAuthenticated);
+  const checkAuth = useUser(state => state.checkAuth);
 
   React.useEffect(() => {
     if (isAuthenticated) navigate('/');
+    checkAuth();
   }, [isAuthenticated]);
 
   return (
@@ -16,8 +18,8 @@ export const Auth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <img
           className="rounded-full bg-white shadow-md p-2 mb-12"
           src="https://seeklogo.com/images/F/firat-universitesi-logo-9A6BF66AC2-seeklogo.com.png"
-          width="100"
-          height="100"
+          width="75"
+          height="75"
         />
         {children}
       </div>

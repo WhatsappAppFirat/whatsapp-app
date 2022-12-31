@@ -38,6 +38,7 @@ export const Login = () => {
             name="email"
             type="text"
             placeholder="Üniversite Eposta"
+            required
           />
         </div>
 
@@ -55,13 +56,14 @@ export const Login = () => {
             name="password"
             type="password"
             placeholder="Şifre"
+            required
           />
         </div>
         <div className="flex flex-col w-2/3 mx-auto text-center">
           <Button
             type="submit"
             className="mt-10"
-            onClick={handleSubmit}
+            onSubmit={handleSubmit}
           >
             Giriş Yap
           </Button>
