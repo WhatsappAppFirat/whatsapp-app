@@ -13,6 +13,7 @@ type User = {
   name: string;
   email: string;
   admin: boolean;
+  school_id: string;
 };
 
 const initialStates = {

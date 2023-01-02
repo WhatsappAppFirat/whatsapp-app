@@ -6,6 +6,7 @@ import { groupActions } from "src/service/groups";
 import { IoMdCheckmark, IoMdClose } from "react-icons/io";
 import useUser from "src/store/useUser";
 import { AiOutlineDelete } from "react-icons/ai";
+import { toast } from "react-hot-toast";
 
 const Group: React.FC<{
   id: string;
@@ -46,7 +47,10 @@ const Group: React.FC<{
             className="border border-green bg-green-500 p-4 rounded-full text-white text-xl"
             onClick={(e) => {
               e.preventDefault();
-              groupActions.updateGroup(id, true).then(refetch);
+              groupActions.updateGroup(id, true).then(() => {
+                refetch();
+                toast.success("Grup onaylandı.");
+              });
             }}
           >
             <IoMdCheckmark />
@@ -58,7 +62,10 @@ const Group: React.FC<{
             className="border border-red bg-red-500 p-4 rounded-full text-white text-xl"
             onClick={(e) => {
               e.preventDefault();
-              groupActions.updateGroup(id, false).then(refetch);
+              groupActions.updateGroup(id, false).then(() => {
+                refetch();
+                toast.success("Grup onayı kaldırıldı.");
+              });
             }}
           >
             <IoMdClose />
@@ -70,7 +77,10 @@ const Group: React.FC<{
             className="border border-red-800 p-4 rounded-full text-red-800 text-xl"
             onClick={(e) => {
               e.preventDefault();
-              groupActions.deleteGroup(id).then(refetch);
+              groupActions.deleteGroup(id).then(() => {
+                refetch();
+                toast.success("Grup silindi.");
+              });
             }}
           >
             <AiOutlineDelete />
@@ -82,9 +92,30 @@ const Group: React.FC<{
 };
 
 export const Home = () => {
+  const user = useUser((state) => state.user);
+  const [name, setName] = React.useState("");
+  const [link, setLink] = React.useState("");
   const { data, isFetching, refetch } = useQuery(["groups"], () =>
     groupActions.getGroups()
   );
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (user) {
+      toast.loading("Grup ekleniyor", { id: "addGroup" });
+      groupActions
+        .addGroup({
+          name,
+          link,
+          department_code: +user.school_id.toString().slice(3, 6),
+        })
+        .then(() => {
+          refetch();
+          toast.success("Yeni grup eklendi!", { id: "addGroup" });
+        });
+    }
+  };
 
   return (
     <div className="text-center">
@@ -93,14 +124,28 @@ export const Home = () => {
         Aşağıdaki listede bulunan gruplardan size uygun olana katılabilirsiniz.
       </h4>
       <div className="flex flex-col gap-6 mt-8 p-6 bg-slate-300 w-3/5 mx-auto rounded-xl">
-        <form className="flex w-2/3 mx-auto my-4">
+        <form className="w-2/3 mx-auto my-4" onSubmit={onSubmit}>
           <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             type="text"
-            className="flex-1 rounded-r-none"
-            placeholder="https://chat.whatsapp.com/*"
-            pattern="(https:\/\/chat\.whatsapp\.com\/)\w+"
+            className="flex-1 w-full mb-4"
+            placeholder="Grup İsmi"
           />
-          <Button className="w-12 min-w-min rounded-l-none">+</Button>
+
+          <div className="flex">
+            <Input
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              type="text"
+              className="flex-1 rounded-r-none"
+              placeholder="https://chat.whatsapp.com/*"
+              pattern="(https:\/\/chat\.whatsapp\.com\/)\w+"
+            />
+            <Button type="submit" className="w-12 min-w-min rounded-l-none">
+              +
+            </Button>
+          </div>
         </form>
         {isFetching && "Gruplar yükleniyor..."}
         {!isFetching &&

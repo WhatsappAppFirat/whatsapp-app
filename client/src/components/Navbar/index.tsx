@@ -21,7 +21,10 @@ export const Navbar = () => {
         </div>
       </div>
       <div>
-        <a href="#" className="mr-8">{user?.name}</a>
+        <a href="#" className="mr-8">
+          {user?.name}
+          {user?.admin && " (ADMIN)"}
+        </a>
         <button onClick={logout}>Çıkış Yap</button>
       </div>
     </div>
